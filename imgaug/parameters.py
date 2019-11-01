@@ -661,6 +661,52 @@ class Deterministic(StochasticParameter):
             return "Deterministic(%s)" % (str(self.value),)
 
 
+# TODO tests
+class DeterministicList(StochasticParameter):
+    """Parameter that repeats elements from a list in the given order.
+
+    E.g. of samples of shape ``(A, B, C)`` are requested, this parameter will
+    return the first ``A*B*C`` elements, reshaped to ``(A, B, C)`` from the
+    provided list. If the list contains less than ``A*B*C`` elements, it
+    will (by default) be tiled until it is long enough (i.e. the sampling
+    will start again at the first element, if necessary multiple times).
+
+    Parameters
+    ----------
+    values : iterable
+        An iterable of values to sample from in the order within the iterable.
+
+    """
+
+    def __init__(self, values, cycle=True):
+        super(DeterministicList, self).__init__()
+
+        assert ia.is_iterable(values), (
+            "Expected to get an iterable as input, got type %s." % (
+                type(values).__name__,))
+        values = np.array(values).flatten()
+        assert len(values) > 0, ("Expected to get at least one value, got "
+                                 "zero.")
+        self.values = values
+
+    def _draw_samples(self, size, random_state):
+        nb_requested = int(np.prod(size))
+        if nb_requested > self.values.size:
+            # we don't use itertools.cycle() here, as that would require
+            # running through a loop potentially many times (as `size` can
+            # be very large), which would be slow
+            multiplier = int(np.ceil(nb_requested / self.values.size))
+            values = np.tile(self.values, (multiplier,))
+        return values[:nb_requested].reshape(size)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "DeterministicList(%s, cycle=%s)" % (str(self.value.tolist()),
+                                                    self.cycle)
+
+
 class Choice(StochasticParameter):
     """Parameter that samples value from a list of allowed values.
 
