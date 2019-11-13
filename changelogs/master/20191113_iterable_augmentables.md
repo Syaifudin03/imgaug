@@ -8,3 +8,7 @@
   to be iterable. Otherwise they would be interpreted as list-likes, causing
   confusion during the normalization.
   This change might affect some use cases where generaters were used
+* Added ability to iterate over coordinate-based `*OnImage` instances
+  (keypoints, bounding boxes, polygons, line strings), e.g.
+  `bbsoi = BoundingBoxesOnImage(bbs, shape=...); for bb in bbsoi: ...`.
+  would iterate now over `bbs`.

@@ -1684,6 +1684,19 @@ class PolygonsOnImage(object):
         polys = [poly.deepcopy() for poly in self.polygons]
         return PolygonsOnImage(polys, tuple(self.shape))
 
+    def __iter__(self):
+        """Iterate over the polygons in this container.
+
+        Yields
+        ------
+        Polygon
+            A polygon in this container.
+            The order is identical to the order in the polygon list
+            provided upon class initialization.
+
+        """
+        return iter(self.polygons)
+
     def __repr__(self):
         return self.__str__()
 
