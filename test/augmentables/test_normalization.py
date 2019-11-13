@@ -2863,19 +2863,19 @@ class TestNormalization(unittest.TestCase):
 
         ntype = normalization._nonempty_info_to_type_str(
             None, False, [])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         ntype = normalization._nonempty_info_to_type_str(
             None, False, [[]])
-        assert ntype == "iterable-iterable[empty]"
+        assert ntype == "list-list[empty]"
 
         ntype = normalization._nonempty_info_to_type_str(
             None, False, [[], []])
-        assert ntype == "iterable-iterable-iterable[empty]"
+        assert ntype == "list-list-list[empty]"
 
         ntype = normalization._nonempty_info_to_type_str(
             None, False, [tuple(), []])
-        assert ntype == "iterable-iterable-iterable[empty]"
+        assert ntype == "list-list-list[empty]"
 
         ntype = normalization._nonempty_info_to_type_str(
             1, True, [tuple([1, 2])])
@@ -2883,7 +2883,7 @@ class TestNormalization(unittest.TestCase):
 
         ntype = normalization._nonempty_info_to_type_str(
             1, True, [[], tuple([1, 2])])
-        assert ntype == "iterable-tuple[number,size=2]"
+        assert ntype == "list-tuple[number,size=2]"
 
         ntype = normalization._nonempty_info_to_type_str(
             1, True, [tuple([1, 2, 3, 4])])
@@ -2891,7 +2891,7 @@ class TestNormalization(unittest.TestCase):
 
         ntype = normalization._nonempty_info_to_type_str(
             1, True, [[], tuple([1, 2, 3, 4])])
-        assert ntype == "iterable-tuple[number,size=4]"
+        assert ntype == "list-tuple[number,size=4]"
 
         with self.assertRaises(AssertionError):
             ntype = normalization._nonempty_info_to_type_str(
@@ -2920,11 +2920,11 @@ class TestNormalization(unittest.TestCase):
 
         ntype = normalization._nonempty_info_to_type_str(
             np.zeros((4, 4, 3), dtype=np.uint8), True, [[]])
-        assert ntype == "iterable-array[uint]"
+        assert ntype == "list-array[uint]"
 
         ntype = normalization._nonempty_info_to_type_str(
             np.zeros((4, 4, 3), dtype=np.uint8), True, [[], []])
-        assert ntype == "iterable-iterable-array[uint]"
+        assert ntype == "list-list-array[uint]"
 
         cls_names = ["Keypoint", "KeypointsOnImage",
                      "BoundingBox", "BoundingBoxesOnImage",
@@ -2949,11 +2949,11 @@ class TestNormalization(unittest.TestCase):
 
             ntype = normalization._nonempty_info_to_type_str(
                 cls, True, [[]])
-            assert ntype == "iterable-%s" % (cls_name,)
+            assert ntype == "list-%s" % (cls_name,)
 
             ntype = normalization._nonempty_info_to_type_str(
                 cls, True, [[], tuple()])
-            assert ntype == "iterable-iterable-%s" % (cls_name,)
+            assert ntype == "list-list-%s" % (cls_name,)
 
     def test_estimate_heatmaps_norm_type(self):
         ntype = normalization.estimate_heatmaps_norm_type(None)
@@ -2972,17 +2972,17 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "HeatmapsOnImage"
 
         ntype = normalization.estimate_heatmaps_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         ntype = normalization.estimate_heatmaps_norm_type(
             [np.zeros((1, 1, 1), dtype=np.float32)])
-        assert ntype == "iterable-array[float]"
+        assert ntype == "list-array[float]"
 
         ntype = normalization.estimate_heatmaps_norm_type([
             ia.HeatmapsOnImage(np.zeros((1, 1, 1), dtype=np.float32),
                                shape=(1, 1, 1))
         ])
-        assert ntype == "iterable-HeatmapsOnImage"
+        assert ntype == "list-HeatmapsOnImage"
 
         # --
         # error cases
@@ -3034,17 +3034,17 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "SegmentationMapsOnImage"
 
         ntype = normalization.estimate_segmaps_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         ntype = normalization.estimate_segmaps_norm_type(
             [np.zeros((1, 1, 1), dtype=np.int32)])
-        assert ntype == "iterable-array[int]"
+        assert ntype == "list-array[int]"
 
         ntype = normalization.estimate_segmaps_norm_type([
             ia.SegmentationMapsOnImage(np.zeros((1, 1, 1), dtype=np.int32),
                                        shape=(1, 1, 1))
         ])
-        assert ntype == "iterable-SegmentationMapsOnImage"
+        assert ntype == "list-SegmentationMapsOnImage"
 
         # --
         # error cases
@@ -3096,34 +3096,34 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "KeypointsOnImage"
 
         ntype = normalization.estimate_keypoints_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_keypoints_norm_type(
                 [np.zeros((5, 2), dtype=dt)])
-            assert ntype == "iterable-array[%s]" % (name,)
+            assert ntype == "list-array[%s]" % (name,)
 
         ntype = normalization.estimate_keypoints_norm_type([(1, 2)])
-        assert ntype == "iterable-tuple[number,size=2]"
+        assert ntype == "list-tuple[number,size=2]"
 
         ntype = normalization.estimate_keypoints_norm_type(
             [ia.Keypoint(x=1, y=2)])
-        assert ntype == "iterable-Keypoint"
+        assert ntype == "list-Keypoint"
 
         ntype = normalization.estimate_keypoints_norm_type([
             ia.KeypointsOnImage([ia.Keypoint(x=1, y=2)], shape=(1, 1, 3))])
-        assert ntype == "iterable-KeypointsOnImage"
+        assert ntype == "list-KeypointsOnImage"
 
         ntype = normalization.estimate_keypoints_norm_type([[]])
-        assert ntype == "iterable-iterable[empty]"
+        assert ntype == "list-list[empty]"
 
         ntype = normalization.estimate_keypoints_norm_type([[(1, 2)]])
-        assert ntype == "iterable-iterable-tuple[number,size=2]"
+        assert ntype == "list-list-tuple[number,size=2]"
 
         ntype = normalization.estimate_keypoints_norm_type(
             [[ia.Keypoint(x=1, y=2)]])
-        assert ntype == "iterable-iterable-Keypoint"
+        assert ntype == "list-list-Keypoint"
 
         # --
         # error cases
@@ -3175,36 +3175,36 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "BoundingBoxesOnImage"
 
         ntype = normalization.estimate_bounding_boxes_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_bounding_boxes_norm_type(
                 [np.zeros((5, 4), dtype=dt)])
-            assert ntype == "iterable-array[%s]" % (name,)
+            assert ntype == "list-array[%s]" % (name,)
 
         ntype = normalization.estimate_bounding_boxes_norm_type([(1, 2, 3, 4)])
-        assert ntype == "iterable-tuple[number,size=4]"
+        assert ntype == "list-tuple[number,size=4]"
 
         ntype = normalization.estimate_bounding_boxes_norm_type([
             ia.BoundingBox(x1=1, y1=2, x2=3, y2=4)])
-        assert ntype == "iterable-BoundingBox"
+        assert ntype == "list-BoundingBox"
 
         ntype = normalization.estimate_bounding_boxes_norm_type([
             ia.BoundingBoxesOnImage([ia.BoundingBox(x1=1, y1=2, x2=3, y2=4)],
                                     shape=(1, 1, 3))])
-        assert ntype == "iterable-BoundingBoxesOnImage"
+        assert ntype == "list-BoundingBoxesOnImage"
 
         ntype = normalization.estimate_bounding_boxes_norm_type([[]])
-        assert ntype == "iterable-iterable[empty]"
+        assert ntype == "list-list[empty]"
 
         ntype = normalization.estimate_bounding_boxes_norm_type(
             [[(1, 2, 3, 4)]])
-        assert ntype == "iterable-iterable-tuple[number,size=4]"
+        assert ntype == "list-list-tuple[number,size=4]"
 
         ntype = normalization.estimate_bounding_boxes_norm_type(
             [[ia.BoundingBox(x1=1, y1=2, x2=3, y2=4)]])
-        assert ntype == "iterable-iterable-BoundingBox"
+        assert ntype == "list-list-BoundingBox"
 
         # --
         # error cases
@@ -3260,65 +3260,65 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "PolygonsOnImage"
 
         ntype = normalization.estimate_polygons_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_polygons_norm_type(
                 [np.zeros((5, 4), dtype=dt)]
             )
-            assert ntype == "iterable-array[%s]" % (name,)
+            assert ntype == "list-array[%s]" % (name,)
 
         ntype = normalization.estimate_polygons_norm_type(points)
-        assert ntype == "iterable-tuple[number,size=2]"
+        assert ntype == "list-tuple[number,size=2]"
 
         ntype = normalization.estimate_polygons_norm_type(
             [ia.Keypoint(x=x, y=y) for x, y in points]
         )
-        assert ntype == "iterable-Keypoint"
+        assert ntype == "list-Keypoint"
 
         ntype = normalization.estimate_polygons_norm_type([ia.Polygon(points)])
-        assert ntype == "iterable-Polygon"
+        assert ntype == "list-Polygon"
 
         ntype = normalization.estimate_polygons_norm_type(
             [ia.PolygonsOnImage([ia.Polygon(points)],
                                 shape=(1, 1, 3))]
         )
-        assert ntype == "iterable-PolygonsOnImage"
+        assert ntype == "list-PolygonsOnImage"
 
         ntype = normalization.estimate_polygons_norm_type([[]])
-        assert ntype == "iterable-iterable[empty]"
+        assert ntype == "list-list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_polygons_norm_type(
                 [[np.zeros((5, 4), dtype=dt)]]
             )
-            assert ntype == "iterable-iterable-array[%s]" % (name,)
+            assert ntype == "list-list-array[%s]" % (name,)
 
         ntype = normalization.estimate_polygons_norm_type([points])
-        assert ntype == "iterable-iterable-tuple[number,size=2]"
+        assert ntype == "list-list-tuple[number,size=2]"
 
         ntype = normalization.estimate_polygons_norm_type([[
             ia.Keypoint(x=x, y=y) for x, y in points
         ]])
-        assert ntype == "iterable-iterable-Keypoint"
+        assert ntype == "list-list-Keypoint"
 
         ntype = normalization.estimate_polygons_norm_type(
             [[ia.Polygon(points)]]
         )
-        assert ntype == "iterable-iterable-Polygon"
+        assert ntype == "list-list-Polygon"
 
         ntype = normalization.estimate_polygons_norm_type([[[]]])
-        assert ntype == "iterable-iterable-iterable[empty]"
+        assert ntype == "list-list-list[empty]"
 
         ntype = normalization.estimate_polygons_norm_type([[points]])
-        assert ntype == "iterable-iterable-iterable-tuple[number,size=2]"
+        assert ntype == "list-list-list-tuple[number,size=2]"
 
         ntype = normalization.estimate_polygons_norm_type(
             [[[ia.Keypoint(x=x, y=y) for x, y in points]]]
         )
-        assert ntype == "iterable-iterable-iterable-Keypoint"
+        assert ntype == "list-list-list-Keypoint"
 
         # --
         # error cases
@@ -3375,66 +3375,66 @@ class TestNormalization(unittest.TestCase):
         assert ntype == "LineStringsOnImage"
 
         ntype = normalization.estimate_line_strings_norm_type([])
-        assert ntype == "iterable[empty]"
+        assert ntype == "list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_line_strings_norm_type(
                 [np.zeros((5, 4), dtype=dt)]
             )
-            assert ntype == "iterable-array[%s]" % (name,)
+            assert ntype == "list-array[%s]" % (name,)
 
         ntype = normalization.estimate_line_strings_norm_type(points)
-        assert ntype == "iterable-tuple[number,size=2]"
+        assert ntype == "list-tuple[number,size=2]"
 
         ntype = normalization.estimate_line_strings_norm_type(
             [ia.Keypoint(x=x, y=y) for x, y in points]
         )
-        assert ntype == "iterable-Keypoint"
+        assert ntype == "list-Keypoint"
 
         ntype = normalization.estimate_line_strings_norm_type(
             [ia.LineString(points)])
-        assert ntype == "iterable-LineString"
+        assert ntype == "list-LineString"
 
         ntype = normalization.estimate_line_strings_norm_type(
             [ia.LineStringsOnImage([ia.LineString(points)],
                                    shape=(1, 1, 3))]
         )
-        assert ntype == "iterable-LineStringsOnImage"
+        assert ntype == "list-LineStringsOnImage"
 
         ntype = normalization.estimate_line_strings_norm_type([[]])
-        assert ntype == "iterable-iterable[empty]"
+        assert ntype == "list-list[empty]"
 
         for name, dt in zip(["float", "int", "uint"],
                             [np.float32, np.int32, np.uint16]):
             ntype = normalization.estimate_line_strings_norm_type(
                 [[np.zeros((5, 4), dtype=dt)]]
             )
-            assert ntype == "iterable-iterable-array[%s]" % (name,)
+            assert ntype == "list-list-array[%s]" % (name,)
 
         ntype = normalization.estimate_line_strings_norm_type([points])
-        assert ntype == "iterable-iterable-tuple[number,size=2]"
+        assert ntype == "list-list-tuple[number,size=2]"
 
         ntype = normalization.estimate_line_strings_norm_type([[
             ia.Keypoint(x=x, y=y) for x, y in points
         ]])
-        assert ntype == "iterable-iterable-Keypoint"
+        assert ntype == "list-list-Keypoint"
 
         ntype = normalization.estimate_line_strings_norm_type(
             [[ia.LineString(points)]]
         )
-        assert ntype == "iterable-iterable-LineString"
+        assert ntype == "list-list-LineString"
 
         ntype = normalization.estimate_line_strings_norm_type([[[]]])
-        assert ntype == "iterable-iterable-iterable[empty]"
+        assert ntype == "list-list-list[empty]"
 
         ntype = normalization.estimate_line_strings_norm_type([[points]])
-        assert ntype == "iterable-iterable-iterable-tuple[number,size=2]"
+        assert ntype == "list-list-list-tuple[number,size=2]"
 
         ntype = normalization.estimate_line_strings_norm_type(
             [[[ia.Keypoint(x=x, y=y) for x, y in points]]]
         )
-        assert ntype == "iterable-iterable-iterable-Keypoint"
+        assert ntype == "list-list-list-Keypoint"
 
         # --
         # error cases
