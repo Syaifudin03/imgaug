@@ -1,4 +1,4 @@
-# Simplified Access to Coordinats and Items in Augmentables
+# Simplified Access to Coordinates and Items in Augmentables #495
 
 * [rarely breaking] Changed the normalization routines for coordinate-based
   augmentables (e.g. keypoints, bounding boxes) to only support lists where
