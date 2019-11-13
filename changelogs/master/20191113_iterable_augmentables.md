@@ -1,4 +1,4 @@
-# Iterables Augmentables
+# Simplified Access to Coordinats and Items in Augmentables
 
 * [rarely breaking] Changed the normalization routines for coordinate-based
   augmentables (e.g. keypoints, bounding boxes) to only support lists where
@@ -17,3 +17,5 @@
 * Added ability to access coordinates of `BoundingBox`, `Polygon` and
   `LineString` using indices or slices, e.g. `line_string[1:]` to get an
   array of all coordinates except the first one.
+* Added property `Keypoint.xy`.
+* Added property `Keypoint.xy_int`.
